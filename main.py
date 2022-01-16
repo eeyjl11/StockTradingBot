@@ -7,6 +7,14 @@ import yfinance as yf
 import datetime as datetime
 import time
 
+#Need to implement a function called every minute to calculate the 200 minute array, the SMA, EMA
+
+#Need to implement a function that will be called once per day to calulate RSI, MACD
+
+#Need to implement function to write values to .csv
+
+#Need to implement a function that will loop through dates to create the dataset for training
+
 start = time.time()
 
 amd = yf.Ticker("AMD")
