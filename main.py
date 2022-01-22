@@ -9,7 +9,7 @@ import time
 
 #Need to implement a function called every minute to calculate the 200 minute array, the SMA, EMA
 
-#Need to implement a function that will be called once per day to calulate RSI, MACD
+#Need to implement a function that will be called once per day to calulate RSI, MACD, Bollinger Bands?
 
 #Need to implement function to write values to .csv
 
@@ -17,9 +17,14 @@ import time
 
 start = time.time()
 
+stock = "AMD"
+
 amd = yf.Ticker("AMD")
 
 today = datetime.datetime.today()
+
+#Depending on time of day called, can give no results as time is before any results
+#Remove any time less than days
 RSILoopStart = (today - BDay(15))
 RSILoopEnd = (today - BDay(1))
 
@@ -32,25 +37,37 @@ print("RSI Loop End 1", RSILoopEnd)
 nyse = mcal.get_calendar('NYSE')
 nyseValidDays = nyse.valid_days(start_date=RSILoopStart, end_date=RSILoopEnd)
 
-print("NYSE Working Days", nyseValidDays)
+endCheck = False
+startCheck = False
 
-#for p in range(len(nyseValidDays)):
+for p in range(len(nyseValidDays)):
     #If Statements not working
     #Needs to check if date is in valid days
     #Use strftime to remove hours and minutes etc
-    #if(RSILoopEnd not in nyseValidDays):
-        #RSILoopStart = (RSILoopStart - BDay(1))
-        #RSILoopEnd = (RSILoopEnd - BDay(1))
+    #If RSILoop = day do nothing
+    #Else - change day
+    if(RSILoopEnd.strftime("%Y-%m-%d") == nyseValidDays[p].strftime("%Y-%m-%d")):
+        endCheck = True
 
-    #if(RSILoopStart not in nyseValidDays):
-        #RSILoopStart = (RSILoopStart - BDay(1))
+    if(RSILoopStart.strftime("%Y-%m-%d") == nyseValidDays[p].strftime("%Y-%m-%d")):
+        startCheck = True
+        
+if(endCheck == False):
+    RSILoopStart = (RSILoopStart - BDay(1))
+    RSILoopEnd = (RSILoopEnd - BDay(1))
+        
+if(startCheck == False):
+    RSILoopStart = (RSILoopStart - BDay(1))
+    
+if(len(nyseValidDays) <= 14):
+    RSILoopStart = (RSILoopStart - BDay(1))
 
 print("RSI Loop Start 2", RSILoopStart)
 print("RSI Loop End 2", RSILoopEnd)
 
 #Open, High, Low, Close, Volume
-amdHistoryPerMinute = amd.history(period="7d", interval="1m", actions=False)
-amdHistoryLastFourteenDays = amd.history(start=RSILoopStart, end = RSILoopEnd, interval="1d", actions=False)
+amdHistoryPerMinute = amd.history(period="200m", interval="1m", actions=False)
+amdHistoryLastFourteenDays = amd.history(start = RSILoopStart, end = RSILoopEnd, interval="1d", actions=False)
 
 print(amdHistoryLastFourteenDays)
 
@@ -84,7 +101,7 @@ for x in range(amdHistoryLength):
     for mediumPeriod in range(50):
         calculatedMediumMA += twoHundredMinuteArray[mediumPeriod]
     
-    calculatedMediumMA = calculatedMediumMA / 50 
+    calculatedMediumMA = calculatedMediumMA / 50
         
     for slowPeriod in range(200):
         calculatedSlowMA += twoHundredMinuteArray[slowPeriod]
@@ -99,11 +116,11 @@ percentLoss = 0
 for z in range(1, 15):
     priceDifference = amdHistoryLastFourteenDays.Close[z] - amdHistoryLastFourteenDays.Close[z-1]
     #print("Price Difference", priceDifference)
+    
     if(priceDifference > 0):
-        
         percentGain += (priceDifference / amdHistoryLastFourteenDays.Close[z-1])*100
-    if(priceDifference < 0):
         
+    if(priceDifference < 0):
         percentLoss += (priceDifference / amdHistoryLastFourteenDays.Close[z-1])*100
 
 averagePercentGain = percentGain / 14
