@@ -16,11 +16,14 @@ import time
 #Need to implement a function that will loop through dates to create the dataset for training
 
 #--------------------------------------------------------------------------------------------------------------------
+
 def perMinuteFundamentals(stock):
     amd = yf.Ticker(stock)
 
     #Open, High, Low, Close, Volume
-    amdHistoryPerMinute = amd.history(period="200m", interval="1m", actions=False)
+    amdHistoryPerMinute = amd.history(period="199m", interval="1m", actions=False)
+
+    print(amdHistoryPerMinute)
 
     amdHistoryLength = len(amdHistoryPerMinute)
 
@@ -39,28 +42,30 @@ def perMinuteFundamentals(stock):
         openArray[x, 4] = amdHistoryPerMinute.Volume[x]
         
         #Calculate the EMA too
-        for y in range(0,199):
-            twoHundredMinuteArray[199-y] = twoHundredMinuteArray[198-y]
+        twoHundredMinuteArray[199-x] = amdHistoryPerMinute.Close[x]
+
+        #if 0 in openArray[x]:
+            #openArray[x] = 0
+
+    print("Price index 0", amdHistoryPerMinute.Close[0])
+    print("Price index 199", amdHistoryPerMinute.Close[199])
+    print("Price index 0", twoHundredMinuteArray[0])
+    print("Price index 199", twoHundredMinuteArray[199])
             
-        twoHundredMinuteArray[0] = amdHistoryPerMinute.Close[x]
+    for fastPeriod in range(20):
+        calculatedFastMA += twoHundredMinuteArray[fastPeriod]
+        
+    calculatedFastMA = calculatedFastMA / 20
             
-        for fastPeriod in range(20):
-            calculatedFastMA += twoHundredMinuteArray[fastPeriod]
+    for mediumPeriod in range(50):
+        calculatedMediumMA += twoHundredMinuteArray[mediumPeriod]
         
-        calculatedFastMA = calculatedFastMA / 20
+    calculatedMediumMA = calculatedMediumMA / 50
             
-        for mediumPeriod in range(50):
-            calculatedMediumMA += twoHundredMinuteArray[mediumPeriod]
+    for slowPeriod in range(200):
+           calculatedSlowMA += twoHundredMinuteArray[slowPeriod]
         
-        calculatedMediumMA = calculatedMediumMA / 50
-            
-        for slowPeriod in range(200):
-            calculatedSlowMA += twoHundredMinuteArray[slowPeriod]
-        
-        calculatedSlowMA = calculatedSlowMA / 200
-        
-        if 0 in openArray[x]:
-            openArray[x] = 0
+    calculatedSlowMA = calculatedSlowMA / 200
 
     print("Fast Moving Average", calculatedFastMA)
     print("Medium Moving Average", calculatedMediumMA)
@@ -79,8 +84,8 @@ def perDayFundamentals(stock):
     #twelvePeriodEMA = 0
     #twentySixPeriodEMA  = 0
 
-    print("RSI Loop Start 1", RSILoopStart)
-    print("RSI Loop End 1", RSILoopEnd)
+    #print("RSI Loop Start 1", RSILoopStart)
+    #print("RSI Loop End 1", RSILoopEnd)
 
     nyse = mcal.get_calendar('NYSE')
     nyseValidDays = nyse.valid_days(start_date=RSILoopStart, end_date=RSILoopEnd)
@@ -105,18 +110,15 @@ def perDayFundamentals(stock):
     if(len(nyseValidDays) <= 14):
         RSILoopStart = (RSILoopStart - BDay(1))
 
-    print("RSI Loop Start 2", RSILoopStart)
-    print("RSI Loop End 2", RSILoopEnd)
+    #print("RSI Loop Start 2", RSILoopStart)
+    #print("RSI Loop End 2", RSILoopEnd)
 
     amdHistoryLastFourteenDays = amd.history(start = RSILoopStart, end = RSILoopEnd, interval="1d", actions=False)
-
-    print(amdHistoryLastFourteenDays)
 
     percentGain = 0
     percentLoss = 0
     for z in range(1, 15):
         priceDifference = amdHistoryLastFourteenDays.Close[z] - amdHistoryLastFourteenDays.Close[z-1]
-        #print("Price Difference", priceDifference)
         
         if(priceDifference > 0):
             percentGain += (priceDifference / amdHistoryLastFourteenDays.Close[z-1])*100
@@ -134,10 +136,10 @@ def perDayFundamentals(stock):
 
     #Implement MACD
 
-    print("Average Percent Gain", averagePercentGain)
-    print("Average Percent Loss", averagePercentLoss)
-    print("Relative Strength", relativeStrength)
-    print("Relative Strength Index", relativeStrengthIndex)
+    #print("Average Percent Gain", averagePercentGain)
+    #print("Average Percent Loss", averagePercentLoss)
+    #print("Relative Strength", relativeStrength)
+    #print("Relative Strength Index", relativeStrengthIndex)
 
 #--------------------------------------------------------------------------------------------------------------------
 
