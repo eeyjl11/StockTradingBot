@@ -19,9 +19,16 @@ import time
 
 def perMinuteFundamentals(stock):
     amd = yf.Ticker(stock)
+    
+    today = datetime.datetime.today()
+    twoHundredMinutes = datetime.timedelta(minutes=199)
+    todayMinus = today - twoHundredMinutes
+    
+    print("Today", today)
+    print("Today minus 200", todayMinus)
 
     #Open, High, Low, Close, Volume
-    amdHistoryPerMinute = amd.history(period="199m", interval="1m", actions=False)
+    amdHistoryPerMinute = amd.history(period="200m", interval="1m", actions=False)
 
     print(amdHistoryPerMinute)
 
