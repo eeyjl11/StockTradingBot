@@ -28,49 +28,41 @@ def perMinuteFundamentals(stock):
     print("Today minus 200", todayMinus)
 
     #Open, High, Low, Close, Volume
-    amdHistoryPerMinute = amd.history(period="200m", interval="1m", actions=False)
+    amdHistoryPerMinute = amd.history(period="199m", interval="1m", actions=False)
 
     print(amdHistoryPerMinute)
 
     amdHistoryLength = len(amdHistoryPerMinute)
 
     openArray = np.zeros(shape=(amdHistoryLength, 5))
-    twoHundredMinuteArray = np.zeros(shape=(200, 1))
 
     calculatedFastMA = 0
     calculatedMediumMA = 0
     calculatedSlowMA = 0
 
-    for x in range(amdHistoryLength):
+    for x in range(200):
         openArray[x, 0] = amdHistoryPerMinute.Open[x]
         openArray[x, 1] = amdHistoryPerMinute.High[x]
         openArray[x, 2] = amdHistoryPerMinute.Low[x]
         openArray[x, 3] = amdHistoryPerMinute.Close[x]
         openArray[x, 4] = amdHistoryPerMinute.Volume[x]
-        
-        #Calculate the EMA too
-        twoHundredMinuteArray[199-x] = amdHistoryPerMinute.Close[x]
 
         #if 0 in openArray[x]:
             #openArray[x] = 0
 
-    print("Price index 0", amdHistoryPerMinute.Close[0])
-    print("Price index 199", amdHistoryPerMinute.Close[199])
-    print("Price index 0", twoHundredMinuteArray[0])
-    print("Price index 199", twoHundredMinuteArray[199])
-            
+    #Calculate the EMA and WMA too
     for fastPeriod in range(20):
-        calculatedFastMA += twoHundredMinuteArray[fastPeriod]
+        calculatedFastMA += openArray[199-fastPeriod, 3]
         
     calculatedFastMA = calculatedFastMA / 20
             
     for mediumPeriod in range(50):
-        calculatedMediumMA += twoHundredMinuteArray[mediumPeriod]
+        calculatedMediumMA += openArray[199-mediumPeriod, 3]
         
     calculatedMediumMA = calculatedMediumMA / 50
             
     for slowPeriod in range(200):
-           calculatedSlowMA += twoHundredMinuteArray[slowPeriod]
+           calculatedSlowMA += openArray[199-slowPeriod, 3]
         
     calculatedSlowMA = calculatedSlowMA / 200
 
