@@ -7,29 +7,49 @@ import yfinance as yf
 import datetime as datetime
 import time
 
-#Need to implement a function called every minute to calculate the 200 minute array, the SMA, EMA
+#--------------------------------------------------------------------------------------------------------------------
 
-#Need to implement a function that will be called once per day to calulate RSI, MACD, Bollinger Bands?
+# Need to implement a function called every minute to calculate the 200 minute array, the SMA, EMA
 
-#Need to implement function to write values to .csv
+# Need to implement a function that will be called once per day to calulate RSI, MACD, Bollinger Bands?
 
-#Need to implement a function that will loop through dates to create the dataset for training
+# Implement multi-threading to do both at same time?
+
+# Need to implement function to write values to database
+
+# Need to implement a function that will loop through dates to create the dataset for training
+
+# Need to implement funtion that checks the database on runtime and updates values to current
+
+# Need to implement machine learning algorithm to detect when to buy and sell, using database values
+
+# Need to implement buying and selling actual stocks
 
 #--------------------------------------------------------------------------------------------------------------------
 
-def perMinuteFundamentals(stock):
+# Function works by checking if a minute has passed
+# If minute has passed then run functions to calculated fundamentals
+# Append these fundamentals to database
+# Run machine learning algorithm on latest row of database
+# Buy and sell stock based on algorithm
+# Profit :)
+
+#--------------------------------------------------------------------------------------------------------------------
+
+def calculateFundamentals(stock):
     amd = yf.Ticker(stock)
     
-    today = datetime.datetime.today()
-    twoHundredMinutes = datetime.timedelta(minutes=199)
+    today = datetime.datetime.today().replace(second = 0, microsecond = 0)
+
+    twoHundredMinutes = datetime.timedelta(minutes=200)
     todayMinus = today - twoHundredMinutes
     
     print("Today", today)
     print("Today minus 200", todayMinus)
 
     #Open, High, Low, Close, Volume
-    amdHistoryPerMinute = amd.history(period="199m", interval="1m", actions=False)
-
+    amdHistoryPerMinute =  amd.history(start = todayMinus, end = today, interval="1m", actions=False)
+ 
     print(amdHistoryPerMinute)
 
     amdHistoryLength = len(amdHistoryPerMinute)
@@ -69,11 +89,6 @@ def perMinuteFundamentals(stock):
     print("Fast Moving Average", calculatedFastMA)
     print("Medium Moving Average", calculatedMediumMA)
     print("Slow Moving Average", calculatedSlowMA)
-
-#--------------------------------------------------------------------------------------------------------------------
-
-def perDayFundamentals(stock):
-    amd = yf.Ticker(stock)
 
     today = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
 
@@ -138,15 +153,14 @@ def perDayFundamentals(stock):
     #print("Average Percent Gain", averagePercentGain)
     #print("Average Percent Loss", averagePercentLoss)
     #print("Relative Strength", relativeStrength)
-    #print("Relative Strength Index", relativeStrengthIndex)
+    print("Relative Strength Index", relativeStrengthIndex)
 
 #--------------------------------------------------------------------------------------------------------------------
 
 def main():
     start = time.time()
     stock = "AMD"
-    perMinuteFundamentals(stock)
-    perDayFundamentals(stock)
+    calculateFundamentals(stock)
     end = time.time()
     print("Time Taken", end-start)
 
