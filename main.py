@@ -8,6 +8,8 @@ import datetime as datetime
 import time
 import schedule
 
+#add readme
+
 #--------------------------------------------------------------------------------------------------------------------
 
 # Need to implement a function called every minute to calculate the 200 minute array, the SMA, EMA
@@ -49,15 +51,11 @@ def perMinute(ticker):
     #Open, High, Low, Close, Volume
     tickerHistoryPerMinute =  ticker.history(start = todayMinus, end = today, interval="1m", actions=False)
  
-    print(tickerHistoryPerMinute)
+    #print(tickerHistoryPerMinute)
 
     tickerHistoryLength = len(tickerHistoryPerMinute)
 
     openArray = np.zeros(shape=(tickerHistoryLength, 5))
-
-    calculatedFastMA = 0
-    calculatedMediumMA = 0
-    calculatedSlowMA = 0
 
     for x in range(200):
         openArray[x, 0] = tickerHistoryPerMinute.Open[x]
@@ -68,6 +66,10 @@ def perMinute(ticker):
 
         #if 0 in openArray[x]:
             #openArray[x] = 0
+            
+    calculatedFastMA = 0
+    calculatedMediumMA = 0
+    calculatedSlowMA = 0
 
     #Calculate the EMA and WMA too
     for fastPeriod in range(20):
@@ -92,11 +94,11 @@ def perMinute(ticker):
 #--------------------------------------------------------------------------------------------------------------------
 
 def perDay(ticker):
+    #check if actual trading day
+    
     #stockList = ["AMD", "TSLA", "MSFT", "AMZN"]
     #for stock in stockList:
-        #check if database has ticker values
-        #if not then create and populate the historical data
-        #check each ticker for up to date historical data, if not up to date then fix that
+        #check database
         #ticker = yf.Ticker(stock)
         #calculate per day with ticker
         #perMinute(ticker)
@@ -125,33 +127,37 @@ def perDay(ticker):
     if(endCheck == False):
         RSILoopStart = (RSILoopStart - BDay(1))
         RSILoopEnd = (RSILoopEnd - BDay(1))
-            
+       
+    #this check will be depreceated as the function will not be called when it's not a trading day     
     if(startCheck == False):
         RSILoopStart = (RSILoopStart - BDay(1))
         
     if(len(nyseValidDays) <= 14):
         RSILoopStart = (RSILoopStart - BDay(1))
-
-    #print("RSI Loop Start 2", RSILoopStart)
-    #print("RSI Loop End 2", RSILoopEnd)
+        
+    #RSI calculation is currently wrong
+    #Works for calculating RSI for the first 14 days of a stock, but needs to use a more exponential version after
+    #[(Previous avg. gain)*13)+ current gain)]/14 should be used for a more exponential calculation
 
     tickerHistoryLastFourteenDays = ticker.history(start = RSILoopStart, end = RSILoopEnd, interval="1d", actions=False)
+    
+    #print(tickerHistoryLastFourteenDays)
 
-    percentGain = 0
-    percentLoss = 0
-    for z in range(1, 15):
-        priceDifference = tickerHistoryLastFourteenDays.Close[z] - tickerHistoryLastFourteenDays.Close[z-1]
+    totalGain = 0
+    totalLoss = 0
+    for z in range(0, 14):
+        priceDifference = tickerHistoryLastFourteenDays.Close[z+1] - tickerHistoryLastFourteenDays.Close[z]
         
         if(priceDifference > 0):
-            percentGain += (priceDifference / tickerHistoryLastFourteenDays.Close[z-1])*100
+            totalGain += priceDifference
             
         if(priceDifference < 0):
-            percentLoss += (priceDifference / tickerHistoryLastFourteenDays.Close[z-1])*100
-
-    averagePercentGain = percentGain / 14
-    averagePercentLoss = (percentLoss / 14) * -1
+            totalLoss += priceDifference
+    
+    averageGain = totalGain / 14
+    averageLoss = (totalLoss / 14) * -1
             
-    relativeStrength = averagePercentGain / averagePercentLoss
+    relativeStrength = averageGain / averageLoss
 
     #Need to calculate smoothed RSI
     relativeStrengthIndex = 100 - (100 / (1 + relativeStrength))
@@ -177,6 +183,14 @@ def main():
     end = time.time()
     print("Time Taken", end-start)
 
+#--------------------------------------------------------------------------------------------------------------------
+
+#def populateDatabase(stock):
+    #check if database for ticker exists
+        #if not, create and populate with historical data from 2000?
+
+    #check if database is up to date
+        #if not populate with missing values
 #--------------------------------------------------------------------------------------------------------------------
 
 main()
