@@ -92,6 +92,15 @@ def perMinute(ticker):
 #--------------------------------------------------------------------------------------------------------------------
 
 def perDay(ticker):
+    #stockList = ["AMD", "TSLA", "MSFT", "AMZN"]
+    #for stock in stockList:
+        #check if database has ticker values
+        #if not then create and populate the historical data
+        #check each ticker for up to date historical data, if not up to date then fix that
+        #ticker = yf.Ticker(stock)
+        #calculate per day with ticker
+        #perMinute(ticker)
+    
     today = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
 
     RSILoopStart = (today - BDay(15))
