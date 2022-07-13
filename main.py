@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 import datetime as datetime
 import time
+import schedule
 
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -36,9 +37,7 @@ import time
 
 #--------------------------------------------------------------------------------------------------------------------
 
-def calculateFundamentals(stock):
-    amd = yf.Ticker(stock)
-    
+def perMinute(ticker):
     today = datetime.datetime.today().replace(second = 0, microsecond = 0)
 
     twoHundredMinutes = datetime.timedelta(minutes=200)
@@ -48,24 +47,24 @@ def calculateFundamentals(stock):
     print("Today minus 200", todayMinus)
 
     #Open, High, Low, Close, Volume
-    amdHistoryPerMinute =  amd.history(start = todayMinus, end = today, interval="1m", actions=False)
+    tickerHistoryPerMinute =  ticker.history(start = todayMinus, end = today, interval="1m", actions=False)
  
-    print(amdHistoryPerMinute)
+    print(tickerHistoryPerMinute)
 
-    amdHistoryLength = len(amdHistoryPerMinute)
+    tickerHistoryLength = len(tickerHistoryPerMinute)
 
-    openArray = np.zeros(shape=(amdHistoryLength, 5))
+    openArray = np.zeros(shape=(tickerHistoryLength, 5))
 
     calculatedFastMA = 0
     calculatedMediumMA = 0
     calculatedSlowMA = 0
 
     for x in range(200):
-        openArray[x, 0] = amdHistoryPerMinute.Open[x]
-        openArray[x, 1] = amdHistoryPerMinute.High[x]
-        openArray[x, 2] = amdHistoryPerMinute.Low[x]
-        openArray[x, 3] = amdHistoryPerMinute.Close[x]
-        openArray[x, 4] = amdHistoryPerMinute.Volume[x]
+        openArray[x, 0] = tickerHistoryPerMinute.Open[x]
+        openArray[x, 1] = tickerHistoryPerMinute.High[x]
+        openArray[x, 2] = tickerHistoryPerMinute.Low[x]
+        openArray[x, 3] = tickerHistoryPerMinute.Close[x]
+        openArray[x, 4] = tickerHistoryPerMinute.Volume[x]
 
         #if 0 in openArray[x]:
             #openArray[x] = 0
@@ -89,7 +88,10 @@ def calculateFundamentals(stock):
     print("Fast Moving Average", calculatedFastMA)
     print("Medium Moving Average", calculatedMediumMA)
     print("Slow Moving Average", calculatedSlowMA)
+    
+#--------------------------------------------------------------------------------------------------------------------
 
+def perDay(ticker):
     today = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
 
     RSILoopStart = (today - BDay(15))
@@ -97,9 +99,6 @@ def calculateFundamentals(stock):
 
     #twelvePeriodEMA = 0
     #twentySixPeriodEMA  = 0
-
-    #print("RSI Loop Start 1", RSILoopStart)
-    #print("RSI Loop End 1", RSILoopEnd)
 
     nyse = mcal.get_calendar('NYSE')
     nyseValidDays = nyse.valid_days(start_date=RSILoopStart, end_date=RSILoopEnd)
@@ -127,18 +126,18 @@ def calculateFundamentals(stock):
     #print("RSI Loop Start 2", RSILoopStart)
     #print("RSI Loop End 2", RSILoopEnd)
 
-    amdHistoryLastFourteenDays = amd.history(start = RSILoopStart, end = RSILoopEnd, interval="1d", actions=False)
+    tickerHistoryLastFourteenDays = ticker.history(start = RSILoopStart, end = RSILoopEnd, interval="1d", actions=False)
 
     percentGain = 0
     percentLoss = 0
     for z in range(1, 15):
-        priceDifference = amdHistoryLastFourteenDays.Close[z] - amdHistoryLastFourteenDays.Close[z-1]
+        priceDifference = tickerHistoryLastFourteenDays.Close[z] - tickerHistoryLastFourteenDays.Close[z-1]
         
         if(priceDifference > 0):
-            percentGain += (priceDifference / amdHistoryLastFourteenDays.Close[z-1])*100
+            percentGain += (priceDifference / tickerHistoryLastFourteenDays.Close[z-1])*100
             
         if(priceDifference < 0):
-            percentLoss += (priceDifference / amdHistoryLastFourteenDays.Close[z-1])*100
+            percentLoss += (priceDifference / tickerHistoryLastFourteenDays.Close[z-1])*100
 
     averagePercentGain = percentGain / 14
     averagePercentLoss = (percentLoss / 14) * -1
@@ -158,9 +157,14 @@ def calculateFundamentals(stock):
 #--------------------------------------------------------------------------------------------------------------------
 
 def main():
+    #need to add scheduling so perDay is called each day
+    #only called on valid trading days (use pandas_market_calendars)
+    
     start = time.time()
-    stock = "AMD"
-    calculateFundamentals(stock)
+    stock = "AMD" 
+    ticker = yf.Ticker(stock)
+    perMinute(ticker)
+    perDay(ticker)
     end = time.time()
     print("Time Taken", end-start)
 
