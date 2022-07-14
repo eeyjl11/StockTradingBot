@@ -42,22 +42,24 @@ import schedule
 def perMinute(ticker):
     today = datetime.datetime.today().replace(second = 0, microsecond = 0)
 
-    twoHundredMinutes = datetime.timedelta(minutes=200)
-    todayMinus = today - twoHundredMinutes
+    #twoHundredMinutes = datetime.timedelta(minutes=200)
+    #todayMinus = today - twoHundredMinutes
     
-    print("Today", today)
-    print("Today minus 200", todayMinus)
+    #print("Today", today)
+    #print("Today minus 200", todayMinus)
 
     #Open, High, Low, Close, Volume
-    tickerHistoryPerMinute =  ticker.history(start = todayMinus, end = today, interval="1m", actions=False)
+    tickerHistoryPerMinute =  ticker.history(period = "202m", interval="1m", actions=False)
  
-    #print(tickerHistoryPerMinute)
+    print("Per minute", tickerHistoryPerMinute)
+    #print("First", tickerHistoryPerMinute.Close[0])
+    #print("Last", tickerHistoryPerMinute.Close[200])
 
     tickerHistoryLength = len(tickerHistoryPerMinute)
 
     openArray = np.zeros(shape=(tickerHistoryLength, 5))
 
-    for x in range(200):
+    for x in range(201):
         openArray[x, 0] = tickerHistoryPerMinute.Open[x]
         openArray[x, 1] = tickerHistoryPerMinute.High[x]
         openArray[x, 2] = tickerHistoryPerMinute.Low[x]
@@ -70,26 +72,70 @@ def perMinute(ticker):
     calculatedFastMA = 0
     calculatedMediumMA = 0
     calculatedSlowMA = 0
+    
+    calculatedFastEA = 0
+    fastEAMultiplier = 2/(20+1)
+    previousFastEA = 0
+    fastEAInitialValue = openArray[180, 3]
+    
+    calculatedMediumEA = 0
+    mediumEAMultiplier = 2/(50+1)
+    previousMediumEA = 0
+    mediumEAInitialValue = openArray[150, 3]
+    
+    calculatedSlowEA = 0
+    slowEAMultiplier = 2/(200+1)
+    previousSlowEA = 0
+    slowEAInitialValue = openArray[0, 3]
 
     #Calculate the EMA and WMA too
+    
+    #Calculate fast period moving averages
     for fastPeriod in range(20):
-        calculatedFastMA += openArray[199-fastPeriod, 3]
+        calculatedFastMA += openArray[200-fastPeriod, 3]
+        
+        if(fastPeriod == 0):
+            calculatedFastEA = (openArray[181, 3] * fastEAMultiplier) + (fastEAInitialValue * (1 - fastEAMultiplier))
+        else:
+            calculatedFastEA = (openArray[181 + fastPeriod, 3] * fastEAMultiplier) + (previousFastEA * (1 - fastEAMultiplier))
+              
+        previousFastEA = calculatedFastEA
         
     calculatedFastMA = calculatedFastMA / 20
             
+    #Calculate medium period moving averages
     for mediumPeriod in range(50):
-        calculatedMediumMA += openArray[199-mediumPeriod, 3]
+        calculatedMediumMA += openArray[200-mediumPeriod, 3]
+        
+        if(mediumPeriod == 0):
+            calculatedMediumEA = (openArray[151, 3] * mediumEAMultiplier) + (mediumEAInitialValue * (1 - mediumEAMultiplier))
+        else:
+            calculatedMediumEA = (openArray[151 + mediumPeriod, 3] * mediumEAMultiplier) + (previousMediumEA * (1 - mediumEAMultiplier))
+              
+        previousMediumEA = calculatedMediumEA
         
     calculatedMediumMA = calculatedMediumMA / 50
-            
+         
+    #Calculate slow period moving averages   
     for slowPeriod in range(200):
-           calculatedSlowMA += openArray[199-slowPeriod, 3]
+        calculatedSlowMA += openArray[200-slowPeriod, 3]
+           
+        if(slowPeriod == 0):
+            calculatedSlowEA = (openArray[1, 3] * slowEAMultiplier) + (slowEAInitialValue * (1 - slowEAMultiplier))
+        else:
+            calculatedSlowEA = (openArray[1 + slowPeriod, 3] * slowEAMultiplier) + (previousSlowEA * (1 - slowEAMultiplier))
+              
+        previousSlowEA = calculatedSlowEA
         
     calculatedSlowMA = calculatedSlowMA / 200
 
     print("Fast Moving Average", calculatedFastMA)
     print("Medium Moving Average", calculatedMediumMA)
     print("Slow Moving Average", calculatedSlowMA)
+    
+    print("Fast Exponential Moving Average", calculatedFastEA)
+    print("Medium Exponential Moving Average", calculatedMediumEA)
+    print("Slow Exponential Moving Average", calculatedSlowEA)
     
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -163,10 +209,6 @@ def perDay(ticker):
     relativeStrengthIndex = 100 - (100 / (1 + relativeStrength))
 
     #Implement MACD
-
-    #print("Average Percent Gain", averagePercentGain)
-    #print("Average Percent Loss", averagePercentLoss)
-    #print("Relative Strength", relativeStrength)
     print("Relative Strength Index", relativeStrengthIndex)
 
 #--------------------------------------------------------------------------------------------------------------------
@@ -175,13 +217,10 @@ def main():
     #need to add scheduling so perDay is called each day
     #only called on valid trading days (use pandas_market_calendars)
     
-    start = time.time()
     stock = "AMD" 
     ticker = yf.Ticker(stock)
     perMinute(ticker)
     perDay(ticker)
-    end = time.time()
-    print("Time Taken", end-start)
 
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -191,6 +230,7 @@ def main():
 
     #check if database is up to date
         #if not populate with missing values
+
 #--------------------------------------------------------------------------------------------------------------------
 
 main()
