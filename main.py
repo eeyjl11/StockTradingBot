@@ -12,6 +12,11 @@ import schedule
 
 #--------------------------------------------------------------------------------------------------------------------
 
+# Currently calculates: - per minute; 20 period EA and SMA, 50 period EA and SMA, 200 period EA and SMA
+#                       - per day; 14 period RSI, MACD
+
+#--------------------------------------------------------------------------------------------------------------------
+
 # Need to implement a function called every minute to calculate the 200 minute array, the SMA, EMA
 
 # Need to implement a function that will be called once per day to calulate RSI, MACD, Bollinger Bands?
@@ -57,86 +62,79 @@ def perMinute(ticker):
 
     tickerHistoryLength = len(tickerHistoryPerMinute)
     
-    #print("Length", tickerHistoryLength)
+    print("Length", tickerHistoryLength)
 
-    openArray = np.zeros(shape=(tickerHistoryLength, 1))
+    #openArray = np.zeros(shape=(tickerHistoryLength, 1))
 
-    for x in range(201):
-        openArray[x, 0] = tickerHistoryPerMinute.Close[x]
+    #for x in range(201):
+        #openArray[x, 0] = tickerHistoryPerMinute.Close[x]
         
-    tickerHistoryPerMinuteVolume = tickerHistoryPerMinute.Close[200]
-
-        #if 0 in openArray[x]:
-            #openArray[x] = 0
+    #tickerHistoryPerMinuteVolume = tickerHistoryPerMinute.Volume[200]
+    
+    #upper bollinger band = sma + (2 * standard deviation)
+    #lower bollinger band = sma - (2 * standard deviation)
             
     calculatedFastMA = 0
     calculatedMediumMA = 0
     calculatedSlowMA = 0
     
-    calculatedFastEA = 0
-    fastEAMultiplier = 2/(20+1)
-    previousFastEA = 0
-    fastEAInitialValue = openArray[180, 0]
-    
-    calculatedMediumEA = 0
-    mediumEAMultiplier = 2/(50+1)
-    previousMediumEA = 0
-    mediumEAInitialValue = openArray[150, 0]
-    
-    calculatedSlowEA = 0
-    slowEAMultiplier = 2/(200+1)
-    previousSlowEA = 0
-    slowEAInitialValue = openArray[0, 0]
-
-    #Calculate the WMA too
     #Could consolidate into one loop with if statements
     
     #Calculate fast period moving averages
+    fastEAMultiplier = 2/(20+1)
+    fastEAInitialValue = tickerHistoryPerMinute.Close[180]
+    
     for fastPeriod in range(20):
-        calculatedFastMA += openArray[200-fastPeriod, 0]
+        calculatedFastMA += tickerHistoryPerMinute.Close[200 - fastPeriod]
         
         if(fastPeriod == 0):
-            calculatedFastEA = (openArray[181, 0] * fastEAMultiplier) + (fastEAInitialValue * (1 - fastEAMultiplier))
+            calculatedFastEA = (tickerHistoryPerMinute.Close[181] * fastEAMultiplier) + (fastEAInitialValue * (1 - fastEAMultiplier))
         else:
-            calculatedFastEA = (openArray[181 + fastPeriod, 0] * fastEAMultiplier) + (previousFastEA * (1 - fastEAMultiplier))
+            calculatedFastEA = (tickerHistoryPerMinute.Close[181 + fastPeriod] * fastEAMultiplier) + (previousFastEA * (1 - fastEAMultiplier))
               
         previousFastEA = calculatedFastEA
         
     calculatedFastMA = calculatedFastMA / 20
             
     #Calculate medium period moving averages
+    mediumEAMultiplier = 2/(50+1)
+    mediumEAInitialValue = tickerHistoryPerMinute.Close[150]
+    
     for mediumPeriod in range(50):
-        calculatedMediumMA += openArray[200-mediumPeriod, 0]
+        calculatedMediumMA += tickerHistoryPerMinute.Close[200 - mediumPeriod]
         
         if(mediumPeriod == 0):
-            calculatedMediumEA = (openArray[151, 0] * mediumEAMultiplier) + (mediumEAInitialValue * (1 - mediumEAMultiplier))
+            calculatedMediumEA = (tickerHistoryPerMinute.Close[151] * mediumEAMultiplier) + (mediumEAInitialValue * (1 - mediumEAMultiplier))
         else:
-            calculatedMediumEA = (openArray[151 + mediumPeriod, 0] * mediumEAMultiplier) + (previousMediumEA * (1 - mediumEAMultiplier))
+            calculatedMediumEA = (tickerHistoryPerMinute.Close[151 + mediumPeriod] * mediumEAMultiplier) + (previousMediumEA * (1 - mediumEAMultiplier))
               
         previousMediumEA = calculatedMediumEA
         
     calculatedMediumMA = calculatedMediumMA / 50
          
-    #Calculate slow period moving averages   
+    #Calculate slow period moving averages  
+    slowEAMultiplier = 2/(200+1)
+    slowEAInitialValue = tickerHistoryPerMinute.Close[0]
+    
     for slowPeriod in range(200):
-        calculatedSlowMA += openArray[200-slowPeriod, 0]
+        calculatedSlowMA += tickerHistoryPerMinute.Close[200 - slowPeriod]
            
         if(slowPeriod == 0):
-            calculatedSlowEA = (openArray[1, 0] * slowEAMultiplier) + (slowEAInitialValue * (1 - slowEAMultiplier))
+            calculatedSlowEA = (tickerHistoryPerMinute.Close[1] * slowEAMultiplier) + (slowEAInitialValue * (1 - slowEAMultiplier))
         else:
-            calculatedSlowEA = (openArray[1 + slowPeriod, 0] * slowEAMultiplier) + (previousSlowEA * (1 - slowEAMultiplier))
+            calculatedSlowEA = (tickerHistoryPerMinute.Close[1 + slowPeriod] * slowEAMultiplier) + (previousSlowEA * (1 - slowEAMultiplier))
               
         previousSlowEA = calculatedSlowEA
         
     calculatedSlowMA = calculatedSlowMA / 200
 
-    #print("Fast Moving Average", calculatedFastMA)
-    #print("Medium Moving Average", calculatedMediumMA)
-    #print("Slow Moving Average", calculatedSlowMA)
+    print("Fast Moving Average", calculatedFastMA)
+    print("Medium Moving Average", calculatedMediumMA)
+    print("Slow Moving Average", calculatedSlowMA)
     
-    #print("Fast Exponential Moving Average", calculatedFastEA)
-    #print("Medium Exponential Moving Average", calculatedMediumEA)
-    #print("Slow Exponential Moving Average", calculatedSlowEA)
+    print("Fast Exponential Moving Average", calculatedFastEA)
+    print("Medium Exponential Moving Average", calculatedMediumEA)
+    print("Slow Exponential Moving Average", calculatedSlowEA)
     
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -152,14 +150,12 @@ def perDay(ticker):
     
     today = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
 
-    RSILoopStart = (today - BDay(48))
+    #Currently not used
+    RSILoopStart = (today - BDay(116))
     RSILoopEnd = (today - BDay(1))
     
     #print("RSI Start", RSILoopStart)
     #print("RSI End", RSILoopEnd)
-
-    #twelvePeriodEMA = 0
-    #twentySixPeriodEMA  = 0
 
     nyse = mcal.get_calendar('NYSE')
     nyseValidDays = nyse.valid_days(start_date=RSILoopStart, end_date=RSILoopEnd)
@@ -189,7 +185,7 @@ def perDay(ticker):
     #Works for calculating RSI for the first 14 days of a stock, but needs to use a more exponential version after
     #[(Previous avg. gain)*13)+ current gain)]/14 is then used for a 30 day smoothed RSI
     
-    perDayLoopStart = (today - BDay(48))
+    perDayLoopStart = (today - BDay(120))
     perDayLoopEnd = (today - BDay(1))
     
     #print("Start", perDayLoopStart)
@@ -216,23 +212,64 @@ def perDay(ticker):
     averageGain = totalGain / 14
     averageLoss = (totalLoss / 14) * -1
             
-    for x in range(0, 30):
-        smoothedPriceDifference = perDayTicker.Close[x + 15] - perDayTicker.Close[x + 14] #15 - 14
+    for x in range(14, 114):
+        smoothedPriceDifference = perDayTicker.Close[x + 1] - perDayTicker.Close[x] #15 - 14
         
         if(smoothedPriceDifference > 0):
             averageGain = ((averageGain * 13) + smoothedPriceDifference) / 14
+            averageLoss = (averageLoss * 13)  / 14
             
         if(smoothedPriceDifference < 0):
             averageLoss = ((averageLoss * 13) + (smoothedPriceDifference * -1)) / 14
+            averageGain = (averageGain * 13) / 14
             
     relativeStrength = averageGain / averageLoss
 
     relativeStrengthIndex = 100 - (100 / (1 + relativeStrength))
     
-    print("Test RSI", relativeStrengthIndex)
+    print("Relative Strength Index", relativeStrengthIndex)
 
-    #Implement MACD
-    #print("Relative Strength Index", relativeStrengthIndex)
+    calculatedTwelvePeriodEA = 0
+    twelvePeriodEAMultiplier = 2/(12+1)
+    previousTwelvePeriodEA = 0
+    twelvePeriodSMAInitialValue = 0
+    
+    for twelvePeriodSMAPeriod in range(12):
+        twelvePeriodSMAInitialValue += perDayTicker.Close[91 + twelvePeriodSMAPeriod]
+        
+    twelvePeriodSMAInitialValue = twelvePeriodSMAInitialValue / 12
+        
+    for twelvePeriodEAPeriod in range(12):
+        if(twelvePeriodEAPeriod == 0):
+            calculatedTwelvePeriodEA = (perDayTicker.Close[103] * twelvePeriodEAMultiplier) + (twelvePeriodSMAInitialValue * (1 - twelvePeriodEAMultiplier))
+        else:
+            calculatedTwelvePeriodEA = (perDayTicker.Close[103 + twelvePeriodEAPeriod] * twelvePeriodEAMultiplier) + (previousTwelvePeriodEA * (1 - twelvePeriodEAMultiplier))
+              
+        previousTwelvePeriodEA = calculatedTwelvePeriodEA
+        
+    calculatedTwentySixPeriodEA = 0
+    twentySixPeriodEAMultiplier = 2/(26+1)
+    previousTwentySixPeriodEA = 0
+    twentySixPeriodSMAInitialValue = 0
+    
+    for twentySixPeriodSMAPeriod in range(26):
+        twentySixPeriodSMAInitialValue += perDayTicker.Close[63 + twentySixPeriodSMAPeriod]
+        
+    twentySixPeriodSMAInitialValue = twentySixPeriodSMAInitialValue / 26
+    
+    for twentySixPeriodEAPeriod in range(26):
+        if(twentySixPeriodEAPeriod == 0):
+            calculatedTwentySixPeriodEA = (perDayTicker.Close[89] * twentySixPeriodEAMultiplier) + (twentySixPeriodSMAInitialValue * (1 - twentySixPeriodEAMultiplier))
+        else:
+            calculatedTwentySixPeriodEA = (perDayTicker.Close[89 + twentySixPeriodEAPeriod] * twentySixPeriodEAMultiplier) + (previousTwentySixPeriodEA * (1 - twentySixPeriodEAMultiplier))
+              
+        previousTwentySixPeriodEA = calculatedTwentySixPeriodEA
+        
+    MACD = calculatedTwelvePeriodEA - calculatedTwentySixPeriodEA
+        
+    #print("Twelve Period EA", calculatedTwelvePeriodEA)
+    #print("Twenty Six Period EA", calculatedTwentySixPeriodEA)
+    print("MACD", MACD)
 
 #--------------------------------------------------------------------------------------------------------------------
 
@@ -240,10 +277,12 @@ def main():
     #need to add scheduling so perDay is called each day
     #only called on valid trading days (use pandas_market_calendars)
     
+    start_time = time.time()
     stock = "AMD" 
     ticker = yf.Ticker(stock)
     perMinute(ticker)
     perDay(ticker)
+    print ("Took", time.time() - start_time, "seconds to run")
 
 #--------------------------------------------------------------------------------------------------------------------
 
