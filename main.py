@@ -54,7 +54,7 @@ def perMinute(ticker):
     #print("Today minus 200", todayMinus)
 
     #Open, High, Low, Close, Volume
-    tickerHistoryPerMinute =  ticker.history(period = "202m", interval="1m", actions=False)
+    tickerHistoryPerMinute =  ticker.history(period = "200m", interval="1m", actions=False)
  
     #print("Per minute", tickerHistoryPerMinute)
     #print("First", tickerHistoryPerMinute.Close[0])
@@ -80,7 +80,7 @@ def perMinute(ticker):
     
     #Could consolidate into one loop with if statements
     
-    #Calculate fast period moving averages
+    # Calculate fast period moving averages
     fastEAMultiplier = 2/(20+1)
     fastEAInitialValue = tickerHistoryPerMinute.Close[180]
     
@@ -96,7 +96,7 @@ def perMinute(ticker):
         
     calculatedFastMA = calculatedFastMA / 20
             
-    #Calculate medium period moving averages
+    # Calculate medium period moving averages
     mediumEAMultiplier = 2/(50+1)
     mediumEAInitialValue = tickerHistoryPerMinute.Close[150]
     
@@ -112,7 +112,7 @@ def perMinute(ticker):
         
     calculatedMediumMA = calculatedMediumMA / 50
          
-    #Calculate slow period moving averages  
+    # Calculate slow period moving averages  
     slowEAMultiplier = 2/(200+1)
     slowEAInitialValue = tickerHistoryPerMinute.Close[0]
     
@@ -283,7 +283,7 @@ def main():
     perMinute(ticker)
     perDay(ticker)
     print ("Took", time.time() - start_time, "seconds to run")
-
+    
 #--------------------------------------------------------------------------------------------------------------------
 
 #def populateDatabase(stock):
