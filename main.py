@@ -47,54 +47,6 @@ from stock import Stock
     
 #--------------------------------------------------------------------------------------------------------------------
 
-def perDay(ticker):    
-    today = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
-
-    #Currently not used
-    RSILoopStart = (today - BDay(116))
-    RSILoopEnd = (today - BDay(1))
-    
-    #print("RSI Start", RSILoopStart)
-    #print("RSI End", RSILoopEnd)
-
-    nyse = mcal.get_calendar('NYSE')
-    nyseValidDays = nyse.valid_days(start_date=RSILoopStart, end_date=RSILoopEnd)
-
-    endCheck = False
-    startCheck = False
-
-    for p in range(len(nyseValidDays)):
-        if(RSILoopEnd.strftime("%Y-%m-%d") == nyseValidDays[p].strftime("%Y-%m-%d")):
-            endCheck = True
-
-        if(RSILoopStart.strftime("%Y-%m-%d") == nyseValidDays[p].strftime("%Y-%m-%d")):
-            startCheck = True
-            
-    if(endCheck == False):
-        RSILoopStart = (RSILoopStart - BDay(1))
-        RSILoopEnd = (RSILoopEnd - BDay(1))
-       
-    #this check will be depreceated as the function will not be called when it's not a trading day     
-    if(startCheck == False):
-        RSILoopStart = (RSILoopStart - BDay(1))
-        
-    if(len(nyseValidDays) <= 14):
-        RSILoopStart = (RSILoopStart - BDay(1))
-        
-    #RSI calculation is currently wrong
-    #Works for calculating RSI for the first 14 days of a stock, but needs to use a more exponential version after
-    #[(Previous avg. gain)*13)+ current gain)]/14 is then used for a 30 day smoothed RSI
-    
-    perDayLoopStart = (today - BDay(120))
-    perDayLoopEnd = (today - BDay(1))
-    
-    #print("Start", perDayLoopStart)
-    #print("End", perDayLoopEnd)
-    
-    
-
-#--------------------------------------------------------------------------------------------------------------------
-
 def main():
     #need to add scheduling so perDay is called each day
     #only called on valid trading days (use pandas_market_calendars)
@@ -127,3 +79,6 @@ def main():
 #--------------------------------------------------------------------------------------------------------------------
 
 main()
+
+# nyse = mcal.get_calendar('NYSE')
+# nyseValidDays = nyse.valid_days(start_date=RSILoopStart, end_date=RSILoopEnd)
