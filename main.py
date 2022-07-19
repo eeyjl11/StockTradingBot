@@ -66,17 +66,6 @@ def main():
     amd = Stock()
     amd.perDay(date, stock)
     amd.perMinute(date, stock)
-    
-#--------------------------------------------------------------------------------------------------------------------
-
-#def populateDatabase(stock):
-    #check if database for ticker exists
-        #if not, create and populate with historical data from 2000?
-
-    #check if database is up to date
-        #if not populate with missing values
-
-#--------------------------------------------------------------------------------------------------------------------
 
 main()
 

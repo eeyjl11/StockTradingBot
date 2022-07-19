@@ -7,7 +7,7 @@ class Stock:
         ticker = yf.Ticker(stock)
 
         #Open, High, Low, Close, Volume
-        tickerHistoryPerMinute =  ticker.history(end = date, period = "200m", interval="1m", actions=False)
+        tickerHistoryPerMinute =  ticker.history(end = date, period = "202m", interval="1m", actions=False)
     
         #print("Per minute", tickerHistoryPerMinute)
         #print("First", tickerHistoryPerMinute.Close[0])
