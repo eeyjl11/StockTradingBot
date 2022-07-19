@@ -1,3 +1,5 @@
+# Calculates the technical indicators for each stock
+
 import yfinance as yf
 
 class Stock:

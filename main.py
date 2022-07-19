@@ -1,3 +1,5 @@
+# Main file that calls appropriate functions to populate datasets, train model and then trade stocks
+
 import pandas as pd
 from pandas.tseries.offsets import BDay
 import pandas_market_calendars as mcal
@@ -45,16 +47,7 @@ from stock import Stock
     
 #--------------------------------------------------------------------------------------------------------------------
 
-def perDay(ticker):
-    #check if actual trading day
-    
-    #stockList = ["AMD", "TSLA", "MSFT", "AMZN"]
-    #for stock in stockList:
-        #check database
-        #ticker = yf.Ticker(stock)
-        #calculate per day with ticker
-        #perMinute(ticker)
-    
+def perDay(ticker):    
     today = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
 
     #Currently not used
@@ -105,6 +98,15 @@ def perDay(ticker):
 def main():
     #need to add scheduling so perDay is called each day
     #only called on valid trading days (use pandas_market_calendars)
+
+    #stockList = ["AMD", "TSLA", "MSFT", "AMZN"]
+    #for stock in stockList:
+        #check database
+        #ticker = yf.Ticker(stock)
+        #calculate per day with ticker
+        #perMinute(ticker)
+
+    # Main will create the dataset and train the ml model then start trading
 
     date = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
     stock = "AMD"
