@@ -3,8 +3,11 @@
 import yfinance as yf
 
 class Stock:
-    def perMinute(self, date, stock):
-        ticker = yf.Ticker(stock)
+    def __init__(self, stock):
+        self.stock = stock
+
+    def perMinute(self, date):
+        ticker = yf.Ticker(self.stock)
 
         #Open, High, Low, Close, Volume
         tickerHistoryPerMinute =  ticker.history(end = date, period = "202m", interval="1m", actions=False)
@@ -89,8 +92,8 @@ class Stock:
         print("Medium Exponential Moving Average", calculatedMediumEA)
         print("Slow Exponential Moving Average", calculatedSlowEA)
 
-    def perDay(self, date, stock):
-        ticker = yf.Ticker(stock)
+    def perDay(self, date):
+        ticker = yf.Ticker(self.stock)
 
         perDayTicker = ticker.history(end = date, period = "115d", interval="1d", actions=False)
     

@@ -61,11 +61,11 @@ def main():
     # Main will create the dataset and train the ml model then start trading
 
     date = datetime.datetime.today().replace(hour = 16, minute = 00, second = 0, microsecond = 0)
-    stock = "AMD"
+    #stock = "AMD"
 
-    amd = Stock()
-    amd.perDay(date, stock)
-    amd.perMinute(date, stock)
+    amd = Stock("AMD")
+    amd.perDay(date)
+    amd.perMinute(date)
 
 main()
 

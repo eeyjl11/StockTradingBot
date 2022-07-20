@@ -9,5 +9,5 @@ class Dataset:
         # If file does exist check if the previous time is current time minus interval
         # If so then calculate current time and add to csv
         # If not populate from last date to current time
-        
+
         print("Will populate database from set date to current time")
